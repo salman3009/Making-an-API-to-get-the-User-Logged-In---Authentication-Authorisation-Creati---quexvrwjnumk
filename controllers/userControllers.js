@@ -30,7 +30,30 @@ Output:
 }
 */
 const getCurrentUser = async (req, res) => {
-    //Write your Code Here
+    const token = req.headers.authorization;
+    if(!token){
+        return res.status(401).json({
+            message:'Unauthorized',
+            status:'Error'
+        })
+    }
+    try{
+        const decoded = jwt.verify(token,JWT_SECRET);
+        const user = await User.findById(decoded.userId);
+        if(!user){
+            return res.status(404).json({
+                message:'User not found',
+                status:'Error'
+            })
+        }
+        return res.status(200).json({user,status:'Success'})
+
+    }catch(err){
+        return res.status(401).json({
+            message:'Unauthorized',
+            status:'Error'
+        })
+    }
 };
 
 // Fetches all Users data [Paginated]
